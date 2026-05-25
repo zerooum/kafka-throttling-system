@@ -1,0 +1,14 @@
+target/
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+**/*.log
+.DS_Store
+.env
+build/
+.mvn/wrapper/maven-wrapper.jar
+.quarkus/
