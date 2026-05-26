@@ -2,6 +2,8 @@ package com.throttling.dlq;
 
 import com.throttling.common.FailureReason;
 import com.throttling.common.MessageEnvelope;
+import io.opentelemetry.instrumentation.annotations.SpanAttribute;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.MutinyEmitter;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -18,7 +20,11 @@ public class DlqProducer {
         this.emitter = emitter;
     }
 
-    public Uni<Void> send(MessageEnvelope original, FailureReason reason, String err, int attempts) {
+    @WithSpan("dlq.send")
+    public Uni<Void> send(MessageEnvelope original,
+                          @SpanAttribute("dlq.reason") FailureReason reason,
+                          String err,
+                          int attempts) {
         return emitter.send(DlqEnvelope.of(original, reason, err, attempts));
     }
 }

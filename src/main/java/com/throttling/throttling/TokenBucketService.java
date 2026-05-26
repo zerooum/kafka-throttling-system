@@ -2,6 +2,7 @@ package com.throttling.throttling;
 
 import com.throttling.observability.MetricsRegistry;
 import io.github.bucket4j.Bandwidth;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import io.github.bucket4j.BucketConfiguration;
 import io.github.bucket4j.distributed.AsyncBucketProxy;
 import io.github.bucket4j.redis.lettuce.cas.LettuceBasedProxyManager;
@@ -69,6 +70,7 @@ public class TokenBucketService {
             .build(cfg.bucketKey().getBytes(), bucketCfg);
     }
 
+    @WithSpan("throttle.acquire")
     public Uni<Void> acquireBlocking() {
         long start = System.nanoTime();
         return Uni.createFrom().completionStage(bucket.asScheduler().consume(1L, scheduler))
