@@ -3,6 +3,7 @@ package com.throttling.ingress;
 import com.throttling.common.MessageEnvelope;
 import com.throttling.common.UlidGenerator;
 import com.throttling.ingress.dto.IngressRequest;
+import com.throttling.observability.MetricsRegistry;
 import io.smallrye.mutiny.Uni;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ class IngressServiceTest {
     IdempotencyStore store;
     MessageProducer producer;
     UlidGenerator ulid;
+    MetricsRegistry metrics;
     IngressService service;
 
     @BeforeEach
@@ -29,7 +31,8 @@ class IngressServiceTest {
         store = mock(IdempotencyStore.class);
         producer = mock(MessageProducer.class);
         ulid = mock(UlidGenerator.class);
-        service = new IngressService(store, producer, ulid, Duration.ofSeconds(60));
+        metrics = mock(MetricsRegistry.class);
+        service = new IngressService(store, producer, ulid, metrics, Duration.ofSeconds(60));
         when(ulid.next()).thenReturn("M1");
     }
 

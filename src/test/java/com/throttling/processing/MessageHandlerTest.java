@@ -7,6 +7,7 @@ import com.throttling.legacy.LegacyClient;
 import com.throttling.legacy.LegacyResponse;
 import com.throttling.legacy.exceptions.LegacyPermanentException;
 import com.throttling.legacy.exceptions.LegacyTransientException;
+import com.throttling.observability.MetricsRegistry;
 import com.throttling.throttling.ThrottleTimeoutException;
 import com.throttling.throttling.TokenBucketService;
 import io.smallrye.mutiny.Uni;
@@ -27,6 +28,7 @@ class MessageHandlerTest {
     TokenBucketService throttle;
     LegacyClient legacy;
     DlqProducer dlq;
+    MetricsRegistry metrics;
     MessageHandler handler;
 
     @BeforeEach
@@ -34,7 +36,8 @@ class MessageHandlerTest {
         throttle = mock(TokenBucketService.class);
         legacy = mock(LegacyClient.class);
         dlq = mock(DlqProducer.class);
-        handler = new MessageHandler(throttle, legacy, dlq, 5);
+        metrics = mock(MetricsRegistry.class);
+        handler = new MessageHandler(throttle, legacy, dlq, metrics, 5);
         when(throttle.acquireBlocking()).thenReturn(Uni.createFrom().voidItem());
         when(dlq.send(any(), any(), any(), anyInt())).thenReturn(Uni.createFrom().voidItem());
     }

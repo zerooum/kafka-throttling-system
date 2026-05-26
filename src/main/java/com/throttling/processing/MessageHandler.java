@@ -6,6 +6,7 @@ import com.throttling.dlq.DlqProducer;
 import com.throttling.legacy.LegacyClient;
 import com.throttling.legacy.exceptions.LegacyPermanentException;
 import com.throttling.legacy.exceptions.LegacyTransientException;
+import com.throttling.observability.MetricsRegistry;
 import com.throttling.throttling.ThrottleTimeoutException;
 import com.throttling.throttling.TokenBucketService;
 import io.smallrye.mutiny.Uni;
@@ -22,16 +23,19 @@ public class MessageHandler {
     private final TokenBucketService throttle;
     private final LegacyClient legacy;
     private final DlqProducer dlq;
+    private final MetricsRegistry metrics;
     private final int maxHardRetries;
 
     @Inject
     public MessageHandler(TokenBucketService throttle,
                           @org.eclipse.microprofile.rest.client.inject.RestClient LegacyClient legacy,
                           DlqProducer dlq,
+                          MetricsRegistry metrics,
                           @ConfigProperty(name = "consumer.max-hard-retries", defaultValue = "5") int maxHardRetries) {
         this.throttle = throttle;
         this.legacy = legacy;
         this.dlq = dlq;
+        this.metrics = metrics;
         this.maxHardRetries = maxHardRetries;
     }
 
@@ -42,12 +46,14 @@ public class MessageHandler {
 
         return throttle.acquireBlocking()
             .chain(() -> legacy.send(endpoint, env.idempotencyKey(), env.payload()))
+            .invoke(() -> { if (metrics != null) metrics.consumed("success"); })
             .replaceWithVoid()
             .onFailure().recoverWithUni(err -> sendToDlq(env, err));
     }
 
     private Uni<Void> sendToDlq(MessageEnvelope env, Throwable err) {
         FailureReason reason = classify(err);
+        if (metrics != null) { metrics.consumed("dlq"); metrics.dlqSent(reason.name()); }
         return dlq.send(env, reason, err.getMessage(), env.attempt());
     }
 

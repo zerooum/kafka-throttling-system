@@ -28,7 +28,7 @@ class TokenBucketServiceTest {
 
         ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
         try {
-            TokenBucketService svc = new TokenBucketService(bucket, Duration.ofSeconds(5), exec);
+            TokenBucketService svc = new TokenBucketService(bucket, Duration.ofSeconds(5), exec, null);
             assertThat(svc.acquireBlocking().await().indefinitely()).isNull();
         } finally {
             exec.shutdownNow();
@@ -45,7 +45,7 @@ class TokenBucketServiceTest {
 
         ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
         try {
-            TokenBucketService svc = new TokenBucketService(bucket, Duration.ofMillis(100), exec);
+            TokenBucketService svc = new TokenBucketService(bucket, Duration.ofMillis(100), exec, null);
             assertThatThrownBy(() -> svc.acquireBlocking().await().atMost(Duration.ofSeconds(2)))
                 .satisfies(t -> {
                     if (t instanceof ThrottleTimeoutException) return;
