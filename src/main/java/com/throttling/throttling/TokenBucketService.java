@@ -11,12 +11,15 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.time.Duration;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @ApplicationScoped
 public class TokenBucketService {
 
     private final AsyncBucketProxy bucket;
     private final Duration acquireTimeout;
+    private final ScheduledExecutorService scheduler;
 
     @Inject
     public TokenBucketService(
@@ -26,8 +29,17 @@ public class TokenBucketService {
     }
 
     public TokenBucketService(AsyncBucketProxy bucket, Duration acquireTimeout) {
+        this(bucket, acquireTimeout, Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "throttle-scheduler");
+            t.setDaemon(true);
+            return t;
+        }));
+    }
+
+    public TokenBucketService(AsyncBucketProxy bucket, Duration acquireTimeout, ScheduledExecutorService scheduler) {
         this.bucket = bucket;
         this.acquireTimeout = acquireTimeout;
+        this.scheduler = scheduler;
     }
 
     private static AsyncBucketProxy buildBucket(RedisClient redisClient, BucketConfig cfg) {
@@ -45,7 +57,7 @@ public class TokenBucketService {
     }
 
     public Uni<Void> acquireBlocking() {
-        return Uni.createFrom().completionStage(bucket.tryConsume(1L))
+        return Uni.createFrom().completionStage(bucket.asScheduler().consume(1L, scheduler))
             .ifNoItem().after(acquireTimeout).failWith(new ThrottleTimeoutException())
             .replaceWithVoid();
     }
