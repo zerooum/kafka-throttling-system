@@ -1,20 +1,21 @@
 package com.throttling.ingress;
 
-import io.quarkus.redis.datasource.value.ReactiveValueCommands;
-import io.quarkus.redis.datasource.ReactiveRedisDataSource;
-import io.quarkus.redis.datasource.value.SetArgs;
-import io.smallrye.mutiny.Uni;
-import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.time.Duration;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.redis.datasource.ReactiveRedisDataSource;
+import io.quarkus.redis.datasource.value.ReactiveValueCommands;
+import io.quarkus.redis.datasource.value.SetArgs;
+import io.smallrye.mutiny.Uni;
 
 class IdempotencyStoreTest {
 

@@ -1,19 +1,21 @@
 package com.throttling.dlq;
 
-import com.throttling.common.FailureReason;
-import com.throttling.common.MessageEnvelope;
-import io.smallrye.mutiny.Uni;
-import io.smallrye.reactive.messaging.MutinyEmitter;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
-import java.time.Instant;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.time.Instant;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
+import com.throttling.common.FailureReason;
+import com.throttling.common.MessageEnvelope;
+
+import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.MutinyEmitter;
 
 class DlqProducerTest {
 

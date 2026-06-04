@@ -1,5 +1,10 @@
 package com.throttling.processing;
 
+import java.util.concurrent.TimeoutException;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
+
 import com.throttling.common.FailureReason;
 import com.throttling.common.MessageEnvelope;
 import com.throttling.dlq.DlqProducer;
@@ -9,13 +14,10 @@ import com.throttling.legacy.exceptions.LegacyTransientException;
 import com.throttling.observability.MetricsRegistry;
 import com.throttling.throttling.ThrottleTimeoutException;
 import com.throttling.throttling.TokenBucketService;
+
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
-
-import java.util.concurrent.TimeoutException;
 
 @ApplicationScoped
 public class MessageHandler {

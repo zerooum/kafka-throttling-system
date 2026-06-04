@@ -7,10 +7,12 @@ export function parse(text) {
   for (const raw of text.split("\n")) {
     const line = raw.trim();
     if (line === "" || line.startsWith("#")) continue;
-    const sp = line.lastIndexOf(" ");
-    if (sp === -1) continue;
-    const key = line.slice(0, sp).trim();
-    const val = Number(line.slice(sp + 1).trim());
+    // Prometheus format: metric{labels} value [timestamp]
+    // Split on whitespace — take first two tokens, ignore optional timestamp.
+    const tokens = line.split(/\s+/);
+    if (tokens.length < 2) continue;
+    const key = tokens[0];
+    const val = Number(tokens[1]);
     if (Number.isNaN(val)) continue;
     out[key] = val;
   }

@@ -64,14 +64,16 @@
             <version>${ulid.version}</version>
         </dependency>
 
-        <!-- test -->
-        <!-- okhttp3 required at test runtime by opentelemetry-exporter-sender-okhttp -->
+        <!-- okhttp3 required at runtime by opentelemetry-exporter-sender-okhttp
+             (the OTLP gRPC exporter enabled in application.properties) -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.12.0</version>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
+
+        <!-- test -->
         <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-junit5</artifactId><scope>test</scope></dependency>
         <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-junit5-mockito</artifactId><scope>test</scope></dependency>
         <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-test-kafka-companion</artifactId><scope>test</scope></dependency>

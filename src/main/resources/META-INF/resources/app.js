@@ -131,7 +131,7 @@ async function pollMetrics() {
     el("t-duplicate").textContent = duplicate;
     el("t-success").textContent = success;
     el("t-dlq").textContent = dlq;
-    el("t-backlog").textContent = Math.max(0, state.published - consumedTotal);
+    el("t-backlog").textContent = Math.max(0, accepted - consumedTotal);
 
     if (state.prevConsumed !== null) {
       const rate = (consumedTotal - state.prevConsumed) / (POLL_MS / 1000);

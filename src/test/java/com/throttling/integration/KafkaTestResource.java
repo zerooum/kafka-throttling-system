@@ -1,12 +1,13 @@
 package com.throttling.integration;
 
-import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
-import io.quarkus.test.kafka.InjectKafkaCompanion;
-import io.smallrye.reactive.messaging.kafka.companion.KafkaCompanion;
+import java.util.Map;
+
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.Map;
+import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+import io.quarkus.test.kafka.InjectKafkaCompanion;
+import io.smallrye.reactive.messaging.kafka.companion.KafkaCompanion;
 
 public class KafkaTestResource implements QuarkusTestResourceLifecycleManager {
 
