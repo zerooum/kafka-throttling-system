@@ -9,4 +9,11 @@ public interface BucketConfig {
     long refillPeriodMs();
     String bucketKey();
     long acquireTimeoutMs();
+
+    Redis redis();
+
+    interface Redis {
+        @io.smallrye.config.WithDefault("localhost") String host();
+        @io.smallrye.config.WithDefault("6379") int port();
+    }
 }

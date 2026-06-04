@@ -5,9 +5,6 @@ import com.throttling.legacy.exceptions.LegacyTransientException;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
