@@ -4,4 +4,55 @@ body {
   background: #0f1115;
   color: #e6e6e6;
 }
-h1 { font-size: 1.25rem; }
+h1 { font-size: 1.25rem; margin-bottom: 1rem; }
+.label { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: #8a93a2; }
+.muted { color: #8a93a2; font-size: 0.8rem; }
+.error { color: #ff6b6b; font-size: 0.85rem; margin: 0.25rem 0; }
+
+.controls { margin-bottom: 1rem; }
+.payload-label { font-size: 0.72rem; text-transform: uppercase; color: #8a93a2; }
+#payload {
+  display: block; width: 100%; max-width: 520px; margin-top: 0.25rem;
+  background: #171a21; color: #e6e6e6; border: 1px solid #2a2f3a;
+  border-radius: 6px; padding: 0.5rem; font-family: monospace; resize: vertical;
+}
+.control-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin-top: 0.6rem; }
+.control-row label { font-size: 0.8rem; color: #c4ccd6; }
+input[type="number"], input[type="text"] {
+  background: #171a21; color: #e6e6e6; border: 1px solid #2a2f3a;
+  border-radius: 5px; padding: 0.3rem 0.4rem;
+}
+input[type="number"] { width: 5rem; }
+button {
+  background: #2563eb; color: #fff; border: none; border-radius: 6px;
+  padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.85rem;
+}
+button:disabled { background: #394150; cursor: not-allowed; }
+
+.tiles { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1rem 0; }
+.tile {
+  background: #171a21; border: 1px solid #2a2f3a; border-radius: 8px;
+  padding: 0.6rem 0.9rem; min-width: 6.5rem;
+}
+.tile .val { display: block; font-size: 1.4rem; font-weight: 600; margin-top: 0.2rem; }
+
+.live { display: flex; flex-wrap: wrap; gap: 1.5rem; margin: 1rem 0; align-items: flex-start; }
+.chart-box canvas {
+  display: block; margin-top: 0.4rem; background: #12151c;
+  border: 1px solid #2a2f3a; border-radius: 8px;
+}
+.gauge-box { min-width: 12rem; }
+.gauge {
+  width: 100%; height: 1.4rem; margin-top: 0.4rem; background: #12151c;
+  border: 1px solid #2a2f3a; border-radius: 8px; overflow: hidden;
+}
+.gauge-fill { height: 100%; width: 0%; background: #2ecc71; transition: width 0.4s ease; }
+
+.log ul {
+  list-style: none; padding: 0; margin: 0.4rem 0 0; max-height: 16rem;
+  overflow-y: auto; font-family: monospace; font-size: 0.82rem;
+}
+.log li { padding: 0.2rem 0; border-bottom: 1px solid #1c2029; }
+.log li.ok { color: #2ecc71; }
+.log li.warn { color: #f0ad4e; }
+.log li.err { color: #ff6b6b; }
