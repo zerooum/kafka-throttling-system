@@ -108,3 +108,74 @@ el("send-burst").addEventListener("click", async () => {
   state.bursting = false;
   progress.textContent = `done ${total}`;
 });
+
+// ---- live polling ----
+
+function setTilesUnknown() {
+  for (const id of ["t-accepted", "t-duplicate", "t-success", "t-dlq", "t-backlog"]) {
+    el(id).textContent = "—";
+  }
+}
+
+async function pollMetrics() {
+  try {
+    const text = await getMetricsText();
+    const p = parse(text);
+    const accepted = sumByTag(p, "messages_ingress_received_total", "outcome", "accepted");
+    const duplicate = sumByTag(p, "messages_ingress_received_total", "outcome", "duplicate");
+    const success = sumByTag(p, "messages_consumed_total", "outcome", "success");
+    const dlq = sumByTag(p, "messages_consumed_total", "outcome", "dlq");
+    const consumedTotal = success + dlq;
+
+    el("t-accepted").textContent = accepted;
+    el("t-duplicate").textContent = duplicate;
+    el("t-success").textContent = success;
+    el("t-dlq").textContent = dlq;
+    el("t-backlog").textContent = Math.max(0, state.published - consumedTotal);
+
+    if (state.prevConsumed !== null) {
+      const rate = (consumedTotal - state.prevConsumed) / (POLL_MS / 1000);
+      spark.push(Math.max(0, rate));
+      el("rate-now").textContent = `${rate.toFixed(0)} msg/s`;
+    }
+    state.prevConsumed = consumedTotal;
+  } catch (e) {
+    setTilesUnknown(); // one failed tick must not stop the loop
+  }
+}
+
+async function pollThrottle() {
+  try {
+    const t = await getThrottle(adminTokenEl.value);
+    const pct = t.capacity ? Math.round((t.available / t.capacity) * 100) : 0;
+    el("gauge-fill").style.width = pct + "%";
+    el("gauge-text").textContent = `${t.available} / ${t.capacity}`;
+    spark.refLine = t.refillTokens ? (t.refillTokens * 1000) / t.refillPeriodMs : 0;
+  } catch (e) {
+    el("gauge-text").textContent = "— / — (check admin token)";
+    el("gauge-fill").style.width = "0%";
+  }
+}
+
+async function pollCb() {
+  try {
+    const c = await getCbStatus(adminTokenEl.value);
+    el("t-cb").textContent = c.state;
+  } catch (e) {
+    el("t-cb").textContent = "—";
+  }
+}
+
+function drawChart() {
+  const canvas = el("chart");
+  const ctx = canvas.getContext("2d");
+  spark.draw(ctx, canvas.width, canvas.height, spark.refLine || 0);
+}
+
+async function tick() {
+  await Promise.all([pollMetrics(), pollThrottle(), pollCb()]);
+  drawChart();
+}
+
+setInterval(tick, POLL_MS);
+tick();
