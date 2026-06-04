@@ -150,7 +150,7 @@ async function pollThrottle() {
     const pct = t.capacity ? Math.round((t.available / t.capacity) * 100) : 0;
     el("gauge-fill").style.width = pct + "%";
     el("gauge-text").textContent = `${t.available} / ${t.capacity}`;
-    spark.refLine = t.refillTokens ? (t.refillTokens * 1000) / t.refillPeriodMs : 0;
+    spark.refLine = t.refillPeriodMs ? (t.refillTokens * 1000) / t.refillPeriodMs : 0;
   } catch (e) {
     el("gauge-text").textContent = "— / — (check admin token)";
     el("gauge-fill").style.width = "0%";
