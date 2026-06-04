@@ -12,3 +12,4 @@ target/
 build/
 .mvn/wrapper/maven-wrapper.jar
 .quarkus/
+.superpowers/
