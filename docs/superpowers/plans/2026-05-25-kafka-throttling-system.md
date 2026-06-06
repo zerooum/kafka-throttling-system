@@ -2044,19 +2044,16 @@ public class MessageHandler {
     @Inject
     public MessageHandler(TokenBucketService throttle,
                           @org.eclipse.microprofile.rest.client.inject.RestClient LegacyClient legacy,
-                          DlqProducer dlq,
-                          @ConfigProperty(name = "consumer.max-hard-retries", defaultValue = "5") int maxHardRetries) {
+                          DlqProducer dlq) {
         this.throttle = throttle;
         this.legacy = legacy;
         this.dlq = dlq;
-        this.maxHardRetries = maxHardRetries;
     }
 
-    public MessageHandler(TokenBucketService throttle, LegacyClient legacy, DlqProducer dlq, int maxHardRetries) {
+    public MessageHandler(TokenBucketService throttle, LegacyClient legacy, DlqProducer dlq) {
         this.throttle = throttle;
         this.legacy = legacy;
         this.dlq = dlq;
-        this.maxHardRetries = maxHardRetries;
     }
 
     public Uni<Void> handle(MessageEnvelope env) {
@@ -2099,7 +2096,6 @@ public class MessageHandler {
         return t;
     }
 
-    public int maxHardRetries() { return maxHardRetries; }
 }
 ```
 

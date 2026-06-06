@@ -37,7 +37,7 @@ class MessageHandlerTest {
         legacy = mock(LegacyClient.class);
         dlq = mock(DlqProducer.class);
         metrics = mock(MetricsRegistry.class);
-        handler = new MessageHandler(throttle, legacy, dlq, metrics, 5);
+        handler = new MessageHandler(throttle, legacy, dlq, metrics);
         when(throttle.acquireBlocking()).thenReturn(Uni.createFrom().voidItem());
         when(dlq.send(any(), any(), any(), anyInt())).thenReturn(Uni.createFrom().voidItem());
     }

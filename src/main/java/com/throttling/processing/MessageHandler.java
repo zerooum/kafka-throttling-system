@@ -2,7 +2,6 @@ package com.throttling.processing;
 
 import java.util.concurrent.TimeoutException;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
 
 import com.throttling.common.FailureReason;
@@ -26,19 +25,16 @@ public class MessageHandler {
     private final LegacyClient legacy;
     private final DlqProducer dlq;
     private final MetricsRegistry metrics;
-    private final int maxHardRetries;
 
     @Inject
     public MessageHandler(TokenBucketService throttle,
                           @org.eclipse.microprofile.rest.client.inject.RestClient LegacyClient legacy,
                           DlqProducer dlq,
-                          MetricsRegistry metrics,
-                          @ConfigProperty(name = "consumer.max-hard-retries", defaultValue = "5") int maxHardRetries) {
+                          MetricsRegistry metrics) {
         this.throttle = throttle;
         this.legacy = legacy;
         this.dlq = dlq;
         this.metrics = metrics;
-        this.maxHardRetries = maxHardRetries;
     }
 
     public Uni<Void> handle(MessageEnvelope env) {
@@ -82,6 +78,4 @@ public class MessageHandler {
         }
         return t;
     }
-
-    public int maxHardRetries() { return maxHardRetries; }
 }
