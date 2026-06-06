@@ -7,12 +7,10 @@ import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenExce
 import com.throttling.common.FailureReason;
 import com.throttling.common.MessageEnvelope;
 import com.throttling.dlq.DlqProducer;
-import com.throttling.legacy.LegacyClient;
 import com.throttling.legacy.exceptions.LegacyPermanentException;
 import com.throttling.legacy.exceptions.LegacyTransientException;
 import com.throttling.observability.MetricsRegistry;
 import com.throttling.throttling.ThrottleTimeoutException;
-import com.throttling.throttling.TokenBucketService;
 
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -21,31 +19,22 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class MessageHandler {
 
-    private final TokenBucketService throttle;
-    private final LegacyClient legacy;
+    private final RetryOrchestrator orchestrator;
     private final DlqProducer dlq;
     private final MetricsRegistry metrics;
 
     @Inject
-    public MessageHandler(TokenBucketService throttle,
-                          @org.eclipse.microprofile.rest.client.inject.RestClient LegacyClient legacy,
+    public MessageHandler(RetryOrchestrator orchestrator,
                           DlqProducer dlq,
                           MetricsRegistry metrics) {
-        this.throttle = throttle;
-        this.legacy = legacy;
+        this.orchestrator = orchestrator;
         this.dlq = dlq;
         this.metrics = metrics;
     }
 
     public Uni<Void> handle(MessageEnvelope env) {
-        String endpoint = env.metadata() != null && env.metadata().targetEndpoint() != null
-            ? env.metadata().targetEndpoint()
-            : "default";
-
-        return throttle.acquireBlocking()
-            .chain(() -> legacy.send(endpoint, env.idempotencyKey(), env.payload()))
+        return orchestrator.execute(env)
             .invoke(() -> { if (metrics != null) metrics.consumed("success"); })
-            .replaceWithVoid()
             .onFailure().recoverWithUni(err -> sendToDlq(env, err));
     }
 
