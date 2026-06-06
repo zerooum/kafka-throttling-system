@@ -130,4 +130,31 @@ class RetryOrchestratorTest {
         verifyNoInteractions(verify);
         verifyNoInteractions(backoff);
     }
+
+    @Test
+    void throttle_timeout_fails_fast_without_calling_legacy_or_verify() {
+        when(throttle.acquireBlocking())
+            .thenReturn(Uni.createFrom().failure(new com.throttling.throttling.ThrottleTimeoutException()));
+
+        assertThatThrownBy(() -> orchestrator.execute(env()).await().indefinitely())
+            .isInstanceOf(com.throttling.throttling.ThrottleTimeoutException.class);
+
+        verifyNoInteractions(legacy);
+        verifyNoInteractions(verify);
+        verifyNoInteractions(backoff);
+    }
+
+    @Test
+    void circuit_open_fails_fast_without_wait_or_check() {
+        when(legacy.send(any(), any(), any()))
+            .thenReturn(Uni.createFrom().failure(
+                new org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException("open")));
+
+        assertThatThrownBy(() -> orchestrator.execute(env()).await().indefinitely())
+            .isInstanceOf(org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException.class);
+
+        verify(legacy, times(1)).send(any(), any(), any());
+        verifyNoInteractions(verify);
+        verifyNoInteractions(backoff);
+    }
 }
