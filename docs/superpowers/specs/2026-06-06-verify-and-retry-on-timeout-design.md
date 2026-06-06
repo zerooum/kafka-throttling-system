@@ -109,8 +109,9 @@ O orquestrador retorna um `Uni<Void>` que **completa** nos caminhos de ack e **f
 
 - **pom:** `quarkus-hibernate-reactive-panache`, `quarkus-reactive-pg-client`.
 - **docker-compose:** serviço `postgres`.
-- **Schema:** Flyway com 1 migration criando `processing_record` (dev/test). Em prod a
-  tabela pertence ao legado → `quarkus.hibernate-orm.database.generation=none`/validate.
+- **Schema:** gerado pela entidade Panache via `quarkus.hibernate-orm.database.generation`:
+  `drop-and-create` em `%dev`/`%test`, `none` em prod (a tabela pertence ao legado).
+  Sem Flyway — evita um datasource JDBC bloqueante só para migrations.
 
 ## Config
 
@@ -128,7 +129,8 @@ quarkus.datasource.reactive.url=postgresql://localhost:5432/throttling
 
 - Esgotadas as 3 chamadas com tabela vazia → propaga o último erro → `sendToDlq`.
 - `FailureReason` = classificação do último erro (`LEGACY_TIMEOUT` ou `LEGACY_5XX`).
-- `attempt` no envelope DLQ = número de chamadas realizadas (3).
+- `attempt` no envelope DLQ permanece o `env.attempt()` atual (contador de entrega do
+  Kafka). A contagem interna de chamadas à API não é modelada no `DlqEnvelope` (YAGNI).
 - Falhas não-retentáveis → DLQ imediato, comportamento e reason atuais preservados.
 
 ## Testes (TDD)
@@ -145,8 +147,10 @@ quarkus.datasource.reactive.url=postgresql://localhost:5432/throttling
 - **`VerificationRepositoryTest`** — integração com `PostgresTestResource`
   (testcontainer, estilo `RedisTestResource`).
 - **`MessageHandlerTest`** — atualizado para delegar ao orquestrador.
-- **IT** — Wiremock (legado em timeout) + Postgres (com e sem linha): caminho
-  ack-por-tabela e caminho DLQ.
+- **Verificação end-to-end manual** via tela de testes (dev): `MockLegacyResource`
+  grava a linha e, com flag `simulateTimeout`, atrasa além do timeout do client →
+  exercita o caminho timeout→achou→ack. IT automatizado multi-container fica como
+  trabalho futuro (YAGNI agora; cobertura real vem dos testes unitários + de repositório).
 
 ## Fora de escopo (YAGNI)
 
