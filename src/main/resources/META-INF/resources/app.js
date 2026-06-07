@@ -33,6 +33,11 @@ function readPayload() {
   }
 }
 
+// Tag the payload with the selected legacy behavior; the dev mock reads `legacyBehavior`.
+function withBehavior(payload) {
+  return { ...payload, legacyBehavior: el("legacy-behavior").value };
+}
+
 function logEntry(text, kind) {
   const ul = el("response-log");
   const li = document.createElement("li");
@@ -60,8 +65,9 @@ async function sendOne(idempotencyKey, payload) {
 }
 
 el("send-one").addEventListener("click", async () => {
-  const payload = readPayload();
-  if (payload === undefined) return;
+  const raw = readPayload();
+  if (raw === undefined) return;
+  const payload = withBehavior(raw);
   const key = crypto.randomUUID();
   state.lastKey = key;
   state.lastPayload = payload;
@@ -76,8 +82,9 @@ el("resend").addEventListener("click", async () => {
 
 el("send-burst").addEventListener("click", async () => {
   if (state.bursting) return;
-  const payload = readPayload();
-  if (payload === undefined) return;
+  const raw = readPayload();
+  if (raw === undefined) return;
+  const payload = withBehavior(raw);
   const total = Math.max(1, parseInt(el("burst-count").value, 10) || 0);
 
   state.bursting = true;

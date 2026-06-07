@@ -41,6 +41,8 @@
         <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-rest-client-jackson</artifactId></dependency>
         <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-messaging-kafka</artifactId></dependency>
         <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-redis-client</artifactId></dependency>
+        <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-hibernate-reactive-panache</artifactId></dependency>
+        <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-reactive-pg-client</artifactId></dependency>
         <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-smallrye-fault-tolerance</artifactId></dependency>
         <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-smallrye-health</artifactId></dependency>
         <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-opentelemetry</artifactId></dependency>
@@ -96,6 +98,13 @@
             <version>2.2.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-test-vertx</artifactId><scope>test</scope></dependency>
         <dependency>
             <groupId>org.wiremock</groupId>
             <artifactId>wiremock-standalone</artifactId>

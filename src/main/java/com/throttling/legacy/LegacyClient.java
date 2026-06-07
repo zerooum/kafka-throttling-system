@@ -8,7 +8,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.HeaderParam;
 import org.eclipse.microprofile.faulttolerance.Bulkhead;
 import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
-import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -25,10 +24,6 @@ public interface LegacyClient {
 
     @POST
     @Path("{endpoint}")
-    @Retry(maxRetries = 3,
-           delay = 200, delayUnit = ChronoUnit.MILLIS,
-           jitter = 100, jitterDelayUnit = ChronoUnit.MILLIS,
-           retryOn = { LegacyTransientException.class, TimeoutException.class })
     @CircuitBreaker(
         requestVolumeThreshold = 20,
         failureRatio = 0.5,

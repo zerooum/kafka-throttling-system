@@ -15,6 +15,13 @@
     </label>
     <div id="payload-error" class="error" hidden></div>
     <div class="control-row">
+      <label class="behavior-label">Legacy behavior
+        <select id="legacy-behavior">
+          <option value="normal">Normal (200)</option>
+          <option value="timeout">Timeout, executes</option>
+          <option value="error">Error 503, no execution</option>
+        </select>
+      </label>
       <button id="send-one">Send 1</button>
       <button id="resend" disabled>Resend last key</button>
       <label>Burst <input id="burst-count" type="number" value="500" min="1"></label>

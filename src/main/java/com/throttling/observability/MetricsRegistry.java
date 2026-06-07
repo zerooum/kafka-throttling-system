@@ -31,6 +31,8 @@ public class MetricsRegistry {
     public void recordWait(Duration d) { timer("throttle.tokens.wait.duration").record(d); }
 
     public void dlqSent(String reason) { counter("dlq.messages.sent", "reason", reason).increment(); }
+    public void verifyChecked(String result) { counter("legacy.verify.checked", "result", result).increment(); }
+    public void apiRetried() { counter("legacy.api.retried").increment(); }
 
     private Counter counter(String name, String... tags) {
         return Counter.builder(name).tags(tags).register(registry);
